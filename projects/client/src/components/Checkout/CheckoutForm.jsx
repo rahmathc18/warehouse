@@ -44,6 +44,7 @@ export const CheckoutForm = () => {
   const [selectedCourier, setSelectedCourier] = useState({});
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const cart = useSelector((state) => state.cartSlice.value);
   const cartQty = useSelector((state) =>
@@ -87,6 +88,7 @@ export const CheckoutForm = () => {
       if (!selectedCourier.id || !address) {
         return;
       }
+      setLoading(true);
       const BASE_API = process.env.REACT_APP_API_BASE_URL;
       const { data } = await axios.get(
         BASE_API +
@@ -94,8 +96,10 @@ export const CheckoutForm = () => {
       );
 
       setServices(data.data[0].costs);
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
