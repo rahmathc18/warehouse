@@ -1,9 +1,23 @@
 import { Button, Flex, Heading, Stack, Text, Divider } from "@chakra-ui/react";
 import { FaArrowRight } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export const CheckoutSummary = (props) => {
   const { cartQty, totalPrice, shipmentCost } = props;
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (shipmentCost < 1) {
+      return Swal.fire({
+        title: "Harap pilih ekspedisi pengiriman",
+        icon: "warning",
+      });
+    }
+
+    navigate("/cart");
+  };
+
   return (
     <Stack
       spacing="5"
@@ -39,8 +53,7 @@ export const CheckoutSummary = (props) => {
         size="lg"
         fontSize="md"
         rightIcon={<FaArrowRight />}
-        as={Link}
-        to={"/checkout"}
+        onClick={handleCheckout}
       >
         Choose Payment Method
       </Button>

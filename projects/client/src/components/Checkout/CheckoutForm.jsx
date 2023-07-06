@@ -93,7 +93,6 @@ export const CheckoutForm = () => {
           `/cost?courier=${selectedCourier.id}&origin=115&destination=${address} `
       );
 
-      console.log("DATA ONGKRI", data.data);
       setServices(data.data[0].costs);
     } catch (error) {
       console.log(error);
@@ -219,7 +218,11 @@ export const CheckoutForm = () => {
           <CheckoutSummary
             cartQty={cartQty}
             totalPrice={totalPrice}
-            shipmentCost={selectedServices.cost[0].value}
+            shipmentCost={
+              Object.keys(selectedServices).length > 0
+                ? selectedServices?.cost[0]?.value
+                : 0
+            }
           />
         </Flex>
       </Stack>
