@@ -47,7 +47,7 @@ module.exports = {
   },
   getOngkir: async (req, res) => {
     try {
-      const { destination, origin, courier } = req.query;
+      const { destination, origin, courier, weight } = req.query;
 
       const response = await (
         await axios.post(
@@ -55,7 +55,7 @@ module.exports = {
           {
             origin: origin,
             destination: destination,
-            weight: 1000,
+            weight: +weight,
             courier: courier,
           },
           {
@@ -67,7 +67,7 @@ module.exports = {
         )
       ).data;
 
-      // console.log(JSON.stringify(response.rajaongkir.results, null, 2));
+      // console.log(JSON.stringify(response.rajaongkir, null, 2));
 
       return res.status(200).json({
         status: true,
