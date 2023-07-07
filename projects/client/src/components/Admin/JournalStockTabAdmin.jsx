@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 
 import { BiSearch } from "react-icons/bi";
-import { BsArrowUp, BsArrowDown } from "react-icons/bs";
+import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 import { SlArrowRight, SlArrowLeft } from "react-icons/sl";
 
 export const ReportList = () => {
@@ -163,9 +163,11 @@ export const ReportList = () => {
                                                 <Center>{item.name}</Center>
                                                 <Stack>
                                                     <IconButton
-                                                        icon={<BsArrowUp />}
+                                                        icon={
+                                                            <BsFillCaretUpFill />
+                                                        }
                                                         size={"xs"}
-                                                        color={"black"}
+                                                        color={"white"}
                                                         onClick={() => {
                                                             setSort(
                                                                 item.origin
@@ -176,9 +178,11 @@ export const ReportList = () => {
                                                         bg={"none"}
                                                     />
                                                     <IconButton
-                                                        icon={<BsArrowDown />}
+                                                        icon={
+                                                            <BsFillCaretDownFill />
+                                                        }
                                                         size={"xs"}
-                                                        color={"black"}
+                                                        color={"white"}
                                                         onClick={() => {
                                                             setSort(
                                                                 item.origin

@@ -1,6 +1,5 @@
 import Axios from "axios";
 import { useEffect, useState, useCallback, useRef } from "react";
-import decode from "jwt-decode";
 
 import {
     Table,
@@ -22,117 +21,57 @@ import {
     Text,
 } from "@chakra-ui/react";
 
-import Swal from "sweetalert2";
-
 import { BiSearch } from "react-icons/bi";
-import {
-    BsFillTrashFill,
-    BsFillCaretDownFill,
-    BsFillCaretUpFill,
-} from "react-icons/bs";
+import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 import { SlArrowRight, SlArrowLeft } from "react-icons/sl";
 
-import { AddProduct } from "./AdminProperties/AddProduct";
-import { EditProduct } from "./AdminProperties/EditProduct";
-import { EditProductImage } from "./AdminProperties/EditProductImage";
-
-export const ProductList = () => {
+export const TransactionList = () => {
     const url = process.env.REACT_APP_API_BASE_URL + "/admin";
     const token = localStorage.getItem("token");
-    const decodedToken = decode(token);
 
-    const [products, setProducts] = useState();
-    const [category, setCategory] = useState();
+    const [transaction, setTransaction] = useState();
     const [sort, setSort] = useState("id");
     const [order, setOrder] = useState("ASC");
     const [page, setPage] = useState(0);
     const [pages, setPages] = useState();
     const [search, setSearch] = useState(``);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
     const searchValue = useRef(``);
 
-    const rupiahID = Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-    });
-
-    const getProducts = useCallback(async () => {
+    const getTransaction = useCallback(async () => {
         try {
-            const productURL =
+            const transactionURL =
                 url +
-                `/fetch-productlist?search=${search}&sort=${sort}&order=${order}&page=${page}`;
+                `/fetch-all-transactions?search=${search}&sort=${sort}&order=${order}&page=${page}&startDate=${startDate}&endDate=${endDate}`;
 
-            const resultProducts = await Axios.get(productURL, {
+            const transactionResult = await Axios.get(transactionURL, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
             });
-            const resultCategories = await Axios.get(
-                process.env.REACT_APP_API_BASE_URL +
-                    "/products/fetch-categories"
-            );
 
-            setProducts(resultProducts.data.result);
-            setPages(resultProducts.data.pages);
-            setCategory(resultCategories.data.result);
+            setTransaction(transactionResult.data.result);
+            setPages(transactionResult.data.pages);
 
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
         } catch (err) {}
-    }, [url, order, page, search, sort, token]);
-
-    const deleteProduct = async (id) => {
-        try {
-            await Axios.delete(url + `/delete-product/${id}`, {
-                headers: {
-                    authorization: `Bearer ${token}`,
-                },
-            });
-            getProducts();
-        } catch (err) {}
-    };
-
-    const deleteWarning = async (id) => {
-        try {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    deleteProduct(id);
-                    Swal.fire(
-                        "Deleted!",
-                        "Your file has been deleted.",
-                        "success"
-                    );
-                }
-            });
-        } catch (err) {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: err.response.data.message,
-            });
-        }
-    };
+    }, [url, order, page, search, sort, token, startDate, endDate]);
 
     useEffect(() => {
-        getProducts();
-    }, [getProducts]);
+        getTransaction();
+    }, [getTransaction]);
 
     const tableHead = [
-        { name: "Id", origin: "id", width: "50px" },
-        { name: "Name", origin: "name", width: "200px" },
-        { name: "Price", origin: "price", width: "200px" },
-        { name: "Weight", origin: "weight", width: "150px" },
-        { name: "Category", origin: "category_id", width: "150px" },
-        { name: "Stock", origin: "stock", width: "150px" },
-        { name: "Brand", origin: "brand", width: "150px" },
+        { name: "Transaction ID", origin: "id", width: "200px" },
+        { name: "Date", origin: "transaction_date", width: "200px" },
+        { name: "User Name", origin: "user_id", width: "200px" },
+        { name: "User Address", origin: "user_address_id", width: "150px" },
+        { name: "Warehouse", origin: "warehouse_location_id", width: "100px" },
+        { name: "Order Status", origin: "order_status_id", width: "100px" },
+        { name: "Expire Date", origin: "expired", width: "100px" },
     ];
 
     return (
@@ -164,20 +103,31 @@ export const ProductList = () => {
                                             setSort("id");
                                             setPage(0);
                                             setOrder("ASC");
+                                            setStartDate(startDate);
+                                            setEndDate(endDate);
                                         }}
                                     />
                                 </InputRightElement>
                             </InputGroup>
                         </Box>
                     </Flex>
-                    {decodedToken.role === 3 ? (
-                        <Center>
-                            <AddProduct
-                                getProducts={getProducts}
-                                category={category}
+                    <Stack direction="row" spacing={4} alignItems="center">
+                        <InputGroup>
+                            <Input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
                             />
-                        </Center>
-                    ) : null}
+                        </InputGroup>
+                        <Text>to</Text>
+                        <InputGroup>
+                            <Input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </InputGroup>
+                    </Stack>
                 </Stack>
             </Center>
             <TableContainer borderRadius={"10px"}>
@@ -234,21 +184,10 @@ export const ProductList = () => {
                                     </Th>
                                 );
                             })}
-                            {decodedToken.role === 3 ? (
-                                <Th
-                                    bg={"#3182CE"}
-                                    textAlign={"center"}
-                                    color={"white"}
-                                    w={"200px"}
-                                    borderY={"none"}
-                                >
-                                    Action
-                                </Th>
-                            ) : null}
                         </Tr>
                     </Thead>
-                    {products ? (
-                        products?.map((item, index) => {
+                    {transaction ? (
+                        transaction?.map((item, index) => {
                             return (
                                 <Tbody
                                     key={index}
@@ -256,60 +195,28 @@ export const ProductList = () => {
                                     _hover={{ bg: "#CAF0F8" }}
                                 >
                                     <Tr>
-                                        <Td>{item.id}</Td>
-                                        <Td whiteSpace={"pre-wrap"}>
-                                            {item.name}
+                                        <Td textAlign={"center"}>{item.id}</Td>
+                                        <Td textAlign={"center"}>
+                                            {item.transaction_date}
                                         </Td>
                                         <Td textAlign={"center"}>
-                                            {rupiahID.format(item.price)}
+                                            {item.user?.name}
                                         </Td>
                                         <Td textAlign={"center"}>
-                                            {item.weight}g
+                                            {item.user_address?.user_address}
                                         </Td>
                                         <Td textAlign={"center"}>
-                                            {item.category?.name}
+                                            {
+                                                item.warehouse_location
+                                                    ?.warehouse_name
+                                            }
                                         </Td>
                                         <Td textAlign={"center"}>
-                                            {item.stock}
+                                            {item.order_status?.status}
                                         </Td>
                                         <Td textAlign={"center"}>
-                                            {item.brand}
+                                            {item.expired}
                                         </Td>
-                                        {decodedToken.role === 3 ? (
-                                            <Td>
-                                                <Flex
-                                                    gap={"20px"}
-                                                    justifyContent={"center"}
-                                                    alignItems={"center"}
-                                                >
-                                                    <EditProduct
-                                                        getProducts={
-                                                            getProducts
-                                                        }
-                                                        category={category}
-                                                        item={item}
-                                                    />
-                                                    <EditProductImage
-                                                        getProducts={
-                                                            getProducts
-                                                        }
-                                                        item={item}
-                                                    />
-                                                    <IconButton
-                                                        onClick={() => {
-                                                            deleteWarning(
-                                                                item.id
-                                                            );
-                                                        }}
-                                                        bg={"none"}
-                                                        color={"#ff4d4d"}
-                                                        icon={
-                                                            <BsFillTrashFill />
-                                                        }
-                                                    />
-                                                </Flex>
-                                            </Td>
-                                        ) : null}
                                     </Tr>
                                 </Tbody>
                             );
@@ -324,11 +231,6 @@ export const ProductList = () => {
                                         </Td>
                                     );
                                 })}
-                                {decodedToken.role === 3 ? (
-                                    <Td>
-                                        <Skeleton h={"10px"} />
-                                    </Td>
-                                ) : null}
                             </Tr>
                         </Tbody>
                     )}
