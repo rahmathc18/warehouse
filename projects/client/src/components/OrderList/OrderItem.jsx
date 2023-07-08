@@ -1,10 +1,27 @@
-import { Box, Button, Flex, Text, useMediaQuery } from "@chakra-ui/react";
-import React from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useDisclosure,
+  useMediaQuery,
+} from "@chakra-ui/react";
+import React, { useState } from "react";
 import Product from "./Product";
+import { AiOutlineCamera } from "react-icons/ai";
 
 const OrderItem = ({ data }) => {
   const [isSmallScreen] = useMediaQuery("(max-width: 666px)");
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [file, setFile] = useState(null);
+  console.log(file);
   return (
     <Flex
       flexDirection={"column"}
@@ -22,10 +39,10 @@ const OrderItem = ({ data }) => {
         borderColor={"gray.200"}
       >
         <Text>#{data.id}</Text>
-        <Text>{data.status}</Text>
+        <Text>{data.order_status.status}</Text>
       </Flex>
       <Flex flexDir={"column"}>
-        {data.products.map((item, i) => (
+        {data.transaction_items.map((item, i) => (
           <Product data={item} key={i} />
         ))}
       </Flex>
@@ -37,9 +54,48 @@ const OrderItem = ({ data }) => {
         borderTop={"2px"}
         borderColor={"gray.200"}
       >
-        <Button colorScheme="green">Upload bukti pembayaran</Button>
+        <Button colorScheme="green" onClick={onOpen}>
+          Upload bukti pembayaran
+        </Button>
         <Button colorScheme="red">Batalkan Pesanan</Button>
       </Flex>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Upload bukti pembayaran</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <label htmlFor="upload">
+              <Flex
+                justifyContent={"center"}
+                alignItems={"center"}
+                fontSize={"3xl"}
+                cursor={"pointer"}
+                border={"dashed"}
+                p={"5"}
+              >
+                <input
+                  type="file"
+                  // value={file}
+                  onChange={(e) => setFile(e.currentTarget.files[0])}
+                  hidden
+                  id="upload"
+                />
+                {file ? <Text>{file.name}</Text> : <AiOutlineCamera />}
+              </Flex>
+            </label>
+          </ModalBody>
+
+          <ModalFooter display={"flex"} justifyContent={"center"} w={"full"}>
+            <Button colorScheme="blue" mr={3} onClick={() => {}}>
+              Upload
+            </Button>
+            <Button variant="solid" colorScheme="red" onClick={onClose}>
+              Batal
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 };
