@@ -3,7 +3,6 @@ import React from "react";
 
 const Product = ({ data }) => {
   const [isSmallScreen] = useMediaQuery("(max-width: 666px)");
-  console.log(data);
   const numberFormatter = (num) => {
     return Intl.NumberFormat("id-ID").format(num);
   };

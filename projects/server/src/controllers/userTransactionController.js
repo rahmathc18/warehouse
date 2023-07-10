@@ -66,11 +66,13 @@ module.exports = {
   updateStatusTransaction: async (req, res) => {
     try {
       const { body, params, files } = req;
-      const { status } = body;
-      // console.log(data);
-
-      if (req.files) {
+      const { id } = params;
+      if (Object.keys(files).length > 0) {
+        body.upload_payment = `Public/images/${req.files.images[0].filename}`;
       }
+
+      console.log(body);
+      await transaction.update(body, { where: { id } });
 
       res.json({
         success: true,

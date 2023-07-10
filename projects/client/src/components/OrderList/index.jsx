@@ -11,11 +11,17 @@ const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("");
   const userId = useSelector((state) => state.userSlice.value.id);
+  const token = localStorage.getItem("token");
 
   const fetchOrderList = async () => {
     try {
       const { data } = await axios.get(
-        BASE_API + `/users/transactions?user_id=${userId}`
+        BASE_API + `/users/transactions?user_id=${userId}`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setOrders(data);
@@ -30,7 +36,10 @@ const OrderList = () => {
 
   return (
     <Box display={"flex"} flexDirection={"column"}>
-      {orders && orders.map((item, i) => <OrderItem key={i} data={item} />)}
+      {orders &&
+        orders.map((item, i) => (
+          <OrderItem key={i} refetch={fetchOrderList} data={item} />
+        ))}
     </Box>
   );
 };
