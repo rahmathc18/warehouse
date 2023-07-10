@@ -71,7 +71,7 @@ module.exports = {
         body.upload_payment = `Public/images/${req.files.images[0].filename}`;
       }
 
-      console.log(body);
+      // console.log(body);
       await transaction.update(body, { where: { id } });
 
       res.json({

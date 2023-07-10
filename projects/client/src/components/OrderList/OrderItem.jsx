@@ -95,6 +95,7 @@ const OrderItem = ({ data, refetch }) => {
       );
 
       await refetch();
+      setFile(null);
     } catch (error) {
       console.log(error);
     }
