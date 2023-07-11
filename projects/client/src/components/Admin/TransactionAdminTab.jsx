@@ -27,6 +27,7 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 
 import { BiSearch } from "react-icons/bi";
@@ -35,11 +36,11 @@ import { SlArrowRight, SlArrowLeft } from "react-icons/sl";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
 
 import Swal from "sweetalert2";
+import axios from "axios";
 
 export const TransactionList = () => {
   const url = process.env.REACT_APP_API_BASE_URL + "/admin";
   const token = localStorage.getItem("token");
-
   const [transaction, setTransaction] = useState();
   const [sort, setSort] = useState("id");
   const [order, setOrder] = useState("ASC");
@@ -48,6 +49,8 @@ export const TransactionList = () => {
   const [search, setSearch] = useState(``);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [openModal, setOpenModal] = useState('');
+
 
   const searchValue = useRef(``);
 
@@ -68,12 +71,13 @@ export const TransactionList = () => {
 
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
-    } catch (err) {}
+    } catch (err) { }
   }, [url, order, page, search, sort, token, startDate, endDate]);
 
   useEffect(() => {
     getTransaction();
   }, [getTransaction]);
+  // console.log(transaction);
 
   const tableHead = [
     { name: "Transaction ID", origin: "id", width: "200px" },
@@ -87,7 +91,15 @@ export const TransactionList = () => {
     { name: "confirmation", origin: "", width: "100px" },
   ];
 
-  const handleAcceptOrder = () => {
+
+  const TEXT_MESSAGE = {
+    1: "Payment rejected!",
+    3: "Payment accepted!",
+    4: "Order accepted!",
+    6: "Order rejected!",
+  }
+
+  const handleAcceptOrder = (id) => {
     Swal.fire({
       text: "Apakah anda ingin menerima pesanan?",
       icon: "warning",
@@ -95,17 +107,14 @@ export const TransactionList = () => {
       showConfirmButton: true,
       confirmButtonColor: "#4BB543",
       confirmButtonText: "Accept",
-    }).then((res) => {
+    }).then(async (res) => {
       if (res.isConfirmed) {
-        Swal.fire({
-          text: "Order is confirmed!",
-          icon: "success",
-        });
+        await updateStatusTransaction(id, 4)
       }
     });
   };
 
-  const handleRejectOrder = () => {
+  const handleRejectOrder = (id) => {
     Swal.fire({
       text: "Apakah anda yakin ingin menolak pesanan?",
       icon: "warning",
@@ -113,17 +122,15 @@ export const TransactionList = () => {
       showConfirmButton: true,
       confirmButtonColor: "red",
       confirmButtonText: "Reject",
-    }).then((res) => {
+    }).then(async (res) => {
       if (res.isConfirmed) {
-        Swal.fire({
-          text: "Order is rejected!",
-          icon: "success",
-        });
+        await updateStatusTransaction(id, 6)
       }
     });
   };
 
-  const handleAcceptPayment = () => {
+  const handleAcceptPayment = (id) => {
+    setOpenModal('')
     Swal.fire({
       text: "Apakah anda ingin menerima pembayaran?",
       icon: "warning",
@@ -131,17 +138,16 @@ export const TransactionList = () => {
       showConfirmButton: true,
       confirmButtonColor: "#4BB543",
       confirmButtonText: "Accept",
-    }).then((res) => {
+    }).then(async (res) => {
       if (res.isConfirmed) {
-        Swal.fire({
-          text: "Payment is confirmed!",
-          icon: "success",
-        });
+        await updateStatusTransaction(id, 3)
       }
     });
   };
 
-  const handleRejectPayment = () => {
+  const handleRejectPayment = (id) => {
+    setOpenModal('')
+
     Swal.fire({
       text: "Apakah anda yakin ingin menolak pembayaran?",
       icon: "warning",
@@ -149,15 +155,32 @@ export const TransactionList = () => {
       showConfirmButton: true,
       confirmButtonColor: "red",
       confirmButtonText: "Reject",
-    }).then((res) => {
+    }).then(async (res) => {
       if (res.isConfirmed) {
-        Swal.fire({
-          text: "Payment is rejected!",
-          icon: "success",
-        });
+        await updateStatusTransaction(id, 1)
+
       }
     });
   };
+
+
+  const updateStatusTransaction = async (id, status) => {
+    try {
+      const { data: res } = await axios.patch(url + `/transaction/${id}`, { status }, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      })
+      console.log(res);
+      await getTransaction()
+      Swal.fire({
+        text: TEXT_MESSAGE[status],
+        icon: 'success'
+      })
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <Box padding={{ base: "10px", lg: "0" }}>
@@ -264,44 +287,73 @@ export const TransactionList = () => {
           {transaction ? (
             transaction?.map((item, index) => {
               return (
-                <Tbody key={index} bg={"#ADE8F4"} _hover={{ bg: "#CAF0F8" }}>
-                  <Tr>
-                    <Td textAlign={"center"}>{item.id}</Td>
-                    <Td textAlign={"center"}>{item.transaction_date}</Td>
-                    <Td textAlign={"center"}>{item.user?.name}</Td>
-                    <Td textAlign={"center"}>
-                      {item.user_address?.user_address}
-                    </Td>
-                    <Td textAlign={"center"}>
-                      {item.warehouse_location?.warehouse_name}
-                    </Td>
-                    <Td textAlign={"center"}>{item.order_status?.status}</Td>
-                    <Td textAlign={"center"}>{item.expired}</Td>
-                    <Td textAlign={"center"}>
-                      <Button colorScheme="blue">View</Button>
-                    </Td>
-                    <Td textAlign={"center"}>
-                      <Flex gap={"3"}>
-                        <Button
-                          onClick={handleAcceptOrder}
-                          variant={"unstyled"}
-                          color={"green.500"}
-                          fontSize={"3xl"}
-                        >
-                          <AiFillCheckCircle />
-                        </Button>
-                        <Button
-                          onClick={handleRejectOrder}
-                          variant={"unstyled"}
-                          color={"red.500"}
-                          fontSize={"3xl"}
-                        >
-                          <AiFillCloseCircle />
-                        </Button>
-                      </Flex>
-                    </Td>
-                  </Tr>
-                </Tbody>
+                <>
+                  <Tbody key={index} bg={"#ADE8F4"} _hover={{ bg: "#CAF0F8" }}>
+                    <Tr>
+                      <Td textAlign={"center"}>{item.id}</Td>
+                      <Td textAlign={"center"}>{item.transaction_date}</Td>
+                      <Td textAlign={"center"}>{item.user?.name}</Td>
+                      <Td textAlign={"center"}>
+                        {item.user_address?.user_address}
+                      </Td>
+                      <Td textAlign={"center"}>
+                        {item.warehouse_location?.warehouse_name}
+                      </Td>
+                      <Td textAlign={"center"}>{item.order_status?.status}</Td>
+                      <Td textAlign={"center"}>{item.expired}</Td>
+                      <Td textAlign={"center"}>
+                        <Button colorScheme="blue" isDisabled={item.order_status_id === 1} onClick={() => setOpenModal(item.id)}>View</Button>
+                      </Td>
+                      <Td textAlign={"center"}>
+                        {
+                          item.order_status_id < 4 ? <Flex gap={"3"}>
+                            <Button
+                              onClick={()=>handleAcceptOrder(item.id)}
+                              variant={"unstyled"}
+                              color={"green.500"}
+                              fontSize={"3xl"}
+                            >
+                              <AiFillCheckCircle />
+                            </Button>
+                            <Button
+                              onClick={()=>handleRejectOrder(item.id)}
+                              variant={"unstyled"}
+                              color={"red.500"}
+                              fontSize={"3xl"}
+                            >
+                              <AiFillCloseCircle />
+                            </Button>
+                          </Flex> : <Text>{item.order_status_id === 6 ? 'Rejected' : 'Confirmed'}</Text>
+                        }
+                      </Td>
+                    </Tr>
+                  </Tbody>
+                  <Modal isOpen={openModal === item.id} onClose={() => setOpenModal('')}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>Payment Proof</ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        <Box>
+                          <img src={item.upload_payment} alt="payment-proof" />
+                        </Box>
+                      </ModalBody>
+                      <ModalFooter>
+                        {
+                          +item.order_status_id < 3 && (
+                            <Flex>
+                              <Button colorScheme="whatsapp" mr={3} onClick={() => handleAcceptPayment(item.id)}>Confirm Payment</Button>
+                              <Button colorScheme='red' onClick={() => handleRejectPayment(item.id)} >
+                                Reject Payment
+                              </Button>
+                            </Flex>
+                          )
+                        }
+                      </ModalFooter>
+                    </ModalContent>
+
+                  </Modal>
+                </>
               );
             })
           ) : (
@@ -344,6 +396,7 @@ export const TransactionList = () => {
           <IconButton icon={<SlArrowRight />} disabled />
         )}
       </Center>
+
     </Box>
   );
 };
