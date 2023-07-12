@@ -13,21 +13,23 @@ const userAddressRouters = require("./userAddressRouters");
 const adminStockReportRouters = require("./adminStockReportRouters");
 const adminTransactionRouters = require("./adminTransactionsRouters");
 const userTransactionRouters = require("./userTransactionRouters");
+const adminSalesReportRouters = require("./adminSalesReportRouters");
 
 module.exports = {
-  userRouters,
-  adminUserRouters,
-  adminWarehouseRouters,
-  rajaOngkirRouters,
-  categoryRouters,
-  adminProductRouters,
-  productRouters,
-  adminStockRouters,
-  userProfileRouters,
-  adminMutationRouters,
-  userOrderRouters,
-  userAddressRouters,
-  adminStockReportRouters,
-  adminTransactionRouters,
-  userTransactionRouters,
+    userRouters,
+    adminUserRouters,
+    adminWarehouseRouters,
+    rajaOngkirRouters,
+    categoryRouters,
+    adminProductRouters,
+    productRouters,
+    adminStockRouters,
+    userProfileRouters,
+    adminMutationRouters,
+    userOrderRouters,
+    userAddressRouters,
+    adminStockReportRouters,
+    adminTransactionRouters,
+    userTransactionRouters,
+    adminSalesReportRouters,
 };
