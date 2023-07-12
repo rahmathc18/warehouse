@@ -13,20 +13,22 @@ const userAddressControllers = require("./userAddressControllers");
 const adminStockReportControllers = require("./adminStockReportControllers");
 const adminTransactionsControllers = require("./adminTransactionControllers");
 const userTransactionControllers = require("./userTransactionController");
+const adminSalesReportControllers = require("./adminSalesReportControllers");
 module.exports = {
-  userControllers,
-  adminUserControllers,
-  adminWarehouseControllers,
-  rajaOngkirControllers,
-  categoryControllers,
-  adminProductControllers,
-  productControllers,
-  adminStockControllers,
-  userProfileControllers,
-  adminMutationControllers,
-  userOrderControllers,
-  userAddressControllers,
-  adminStockReportControllers,
-  adminTransactionsControllers,
-  userTransactionControllers,
+    userControllers,
+    adminUserControllers,
+    adminWarehouseControllers,
+    rajaOngkirControllers,
+    categoryControllers,
+    adminProductControllers,
+    productControllers,
+    adminStockControllers,
+    userProfileControllers,
+    adminMutationControllers,
+    userOrderControllers,
+    userAddressControllers,
+    adminStockReportControllers,
+    adminTransactionsControllers,
+    userTransactionControllers,
+    adminSalesReportControllers,
 };

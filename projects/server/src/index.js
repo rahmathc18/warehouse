@@ -51,6 +51,7 @@ const {
     adminStockReportRouters,
     adminTransactionRouters,
     userTransactionRouters,
+    adminSalesReportRouters,
 } = require("./routes/index");
 
 //users
@@ -69,6 +70,7 @@ app.use("/api/admin", adminStockRouters);
 app.use("/api/admin", adminMutationRouters);
 app.use("/api/admin", adminStockReportRouters);
 app.use("/api/admin", adminTransactionRouters);
+app.use("/api/admin", adminSalesReportRouters);
 
 //products
 app.use("/api/products", productRouters);
@@ -115,6 +117,6 @@ app.listen(PORT, (err) => {
         console.log(`ERROR: ${err}`);
     } else {
         // db.sequelize.sync({ alter: true });
-        console.log(`APP RUNNING at ${PORT} ✅✅`);
+        console.log(`APP RUNNING at ${PORT} ✅`);
     }
 });
