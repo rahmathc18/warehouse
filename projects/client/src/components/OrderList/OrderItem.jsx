@@ -81,6 +81,20 @@ const OrderItem = ({ data, refetch }) => {
     });
   };
 
+  const handleAcceptOrder = async () => {
+    const formData = new FormData();
+    formData.append("order_status_id", 5); 
+    // await updateTransaction(formData);
+    Swal.fire({
+      text: "Apakah anda yakin sudah menerima order?",
+      icon: "warning",
+      showConfirmButton:true,
+      showCancelButton:true
+    });
+  };
+
+  
+
   const updateTransaction = async (body) => {
     try {
       const { data: response } = await axios.patch(
@@ -161,6 +175,20 @@ const OrderItem = ({ data, refetch }) => {
           </Button>
           <Button colorScheme="red" onClick={handleCancelOrder}>
             Batalkan Pesanan
+          </Button>
+        </Flex>
+      )}
+      {data.order_status.id === 4 && (
+        <Flex
+          p={"2"}
+          flexDirection={isSmallScreen ? "column" : "row"}
+          gap={"2"}
+          justifyContent={"space-between"}
+          borderTop={"2px"}
+          borderColor={"gray.200"}
+        >
+          <Button colorScheme="green" onClick={handleAcceptOrder}>
+            Selesaikan Pesanan
           </Button>
         </Flex>
       )}
