@@ -80,7 +80,6 @@ module.exports = {
             model:product_location
           }]
         })
-      console.log("BODY", JSON.stringify(currTransactionItems, null,2));
        
         await Promise.all(
           currTransactionItems.map(async (item,i)=>{
@@ -93,12 +92,12 @@ module.exports = {
             })
             await stock_journal.create({
               journal_date: new Date(),
-              type: 'Cancel Order',
+              type: 'Canceled',
               increment_change:item.qty,
               decrement_change: 0,
               total_qty_before:pl.qty , 
               new_total_qty: pl.qty + item.qty,
-              description: 'Cancel Order',
+              description: 'Canceled',
               createdAt: new Date(),
               updatedAt: new Date(),
               product_id: pl.product_id,
