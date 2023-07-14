@@ -72,15 +72,15 @@ module.exports = {
         body.upload_payment = `Public/images/${req.files.images[0].filename}`;
       }
 
-      console.log("BODY", body.order_status_id);
 
-      if (body.order_status_id === 6) {
+      if (+body.order_status_id === 6) {
         const currTransactionItems = await transaction_item.findAll({
           where : {transaction_id: id},
-          includes:[{
+          include:[{
             model:product_location
           }]
         })
+      console.log("BODY", JSON.stringify(currTransactionItems, null,2));
        
         await Promise.all(
           currTransactionItems.map(async (item,i)=>{
@@ -101,7 +101,7 @@ module.exports = {
               description: 'Cancel Order',
               createdAt: new Date(),
               updatedAt: new Date(),
-              product_id: item,
+              product_id: pl.product_id,
               warehouse_location_id: item.warehouse_location_id
             })
           })
