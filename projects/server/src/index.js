@@ -7,6 +7,7 @@ const db = require("./models");
 const scheduler = require('node-schedule')
 const transaction = db.transaction;
 const { Op } = require('sequelize')
+const moment = require('moment')
 
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -124,8 +125,8 @@ const checkPayment = async () => {
             where: {
                 order_status_id: 1,
                 transaction_date: {
-                    [Op.gte]: new Date(+currentDate.getFullYear(), +currentDate.getMonth(), +currentDate.getDate(),0,0),
-                    [Op.lt]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+                    [Op.gte]:new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()).setUTCHours(0,0,0,0),
+                    [Op.lt]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1).setUTCHours(0,0,0,0)
                 }
             }
         })
@@ -181,7 +182,7 @@ const checkSent = async () => {
 }
 
 
-const schedule1 = scheduler.scheduleJob('*/10 * * * *', checkPayment);
+const schedule1 = scheduler.scheduleJob('* * * * *', checkPayment);
 const schedule2 = scheduler.scheduleJob('0 1 * * *', checkSent);
 
 
