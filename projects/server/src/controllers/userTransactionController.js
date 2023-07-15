@@ -90,6 +90,12 @@ module.exports = {
                 id: item.product_location_id
               } 
             })
+            await product.increment('stock',{
+              by: item.qty,
+              where : {
+                id: item.product_location_id
+              } 
+            })
             await stock_journal.create({
               journal_date: new Date(),
               type: 'Canceled',
