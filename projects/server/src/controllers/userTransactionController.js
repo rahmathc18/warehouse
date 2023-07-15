@@ -16,16 +16,20 @@ module.exports = {
   fetchAll: async (req, res) => {
     try {
       const { page, user_id, status } = req.query;
-
+      const itemsPerPage = 10;
+      const offset = (+page - 1) * itemsPerPage;
       const condition = {
         user_id: user_id,
-        order_status_id: status ? status : { [Op.not]: null },
+        order_status_id: +status !== 0 ? +status : { [Op.not]: null },
+
       };
 
+
       const data = await transaction.findAll({
-        limit: 10,
-        offset: page ? +page * 10 : 0,
+        limit: itemsPerPage,
+        offset: offset,
         where: condition,
+        order: [['transaction_date', 'DESC']],
         include: [
           {
             model: transaction_item,
@@ -57,8 +61,11 @@ module.exports = {
         ],
       });
 
+      const totalItems = await data.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+
       // console.log(data);
-      res.json(data);
+      res.json({ data, totalPages });
     } catch (error) {
       console.log(error);
       res.status(400).send("Failed");
