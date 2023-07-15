@@ -4,9 +4,9 @@ const express = require("express");
 const cors = require("cors");
 const { join } = require("path");
 const db = require("./models");
-const scheduler = require('node-schedule')
+const scheduler = require("node-schedule");
 const transaction = db.transaction;
-const { Op } = require('sequelize')
+const { Op } = require("sequelize");
 
 const PORT = process.env.PORT || 8000;
 const app = express();
@@ -119,71 +119,83 @@ app.get("*", (req, res) => {
 const checkPayment = async () => {
     try {
         console.log("CHECKING PAYMENT");
-        const currentDate = new Date()
+        const currentDate = new Date();
         const transactions = await transaction.findAll({
             where: {
                 order_status_id: 1,
                 transaction_date: {
-                    [Op.gte]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
-                    [Op.lt]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
-                }
-            }
-        })
+                    [Op.gte]: new Date(
+                        currentDate.getFullYear(),
+                        currentDate.getMonth(),
+                        currentDate.getDate()
+                    ),
+                    [Op.lt]: new Date(
+                        currentDate.getFullYear(),
+                        currentDate.getMonth(),
+                        currentDate.getDate() + 1
+                    ),
+                },
+            },
+        });
 
         await Promise.all(
-            transactions.map(async item => {
-                const expDate = new Date(item.expired)
+            transactions.map(async (item) => {
+                const expDate = new Date(item.expired);
                 if (expDate < currentDate) {
-                    await transaction.update({
-                        order_status_id: 6
-                    }, { where: { id: item.id } })
+                    await transaction.update(
+                        {
+                            order_status_id: 6,
+                        },
+                        { where: { id: item.id } }
+                    );
                 }
             })
-        )
-
+        );
     } catch (error) {
         console.log("Error Check Payment", error);
     }
-}
+};
 const checkSent = async () => {
     try {
         // console.log("CHECKING Sent");
-        const currentDate = new Date()
-
+        const currentDate = new Date();
 
         // return daysDifference > 7;
-        const transactions = await transaction.findAll({
-            order_status_id: 4,
-        }, {
-            where: {
-                id: item.id
+        const transactions = await transaction.findAll(
+            {
+                order_status_id: 4,
+            },
+            {
+                where: {
+                    id: item.id,
+                },
             }
-        })
-
+        );
 
         await Promise.all(
-            transactions.map(async item => {
-                const expDate = new Date(item.transaction_date)
-                const timeDifference = currentDate.getTime() - expDate.getTime();
+            transactions.map(async (item) => {
+                const expDate = new Date(item.transaction_date);
+                const timeDifference =
+                    currentDate.getTime() - expDate.getTime();
                 const daysDifference = timeDifference / (1000 * 3600 * 24);
 
                 if (daysDifference > 6) {
-                    await transaction.update({
-                        order_status_id: 5
-                    }, { where: { id: item.id } })
+                    await transaction.update(
+                        {
+                            order_status_id: 5,
+                        },
+                        { where: { id: item.id } }
+                    );
                 }
             })
-        )
-
+        );
     } catch (error) {
         console.log("Error Check Sent", error);
     }
-}
+};
 
-
-const schedule1 = scheduler.scheduleJob('*/10 * * * *', checkPayment);
-const schedule2 = scheduler.scheduleJob('0 1 * * *', checkSent);
-
+const schedule1 = scheduler.scheduleJob("*/10 * * * *", checkPayment);
+const schedule2 = scheduler.scheduleJob("0 1 * * *", checkSent);
 
 app.listen(PORT, (err) => {
     if (err) {
