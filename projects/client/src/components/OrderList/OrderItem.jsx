@@ -83,17 +83,24 @@ const OrderItem = ({ data, refetch }) => {
 
   const handleAcceptOrder = async () => {
     const formData = new FormData();
-    formData.append("order_status_id", 5); 
-    // await updateTransaction(formData);
+    formData.append("order_status_id", 5);
     Swal.fire({
       text: "Apakah anda yakin sudah menerima order?",
       icon: "warning",
-      showConfirmButton:true,
-      showCancelButton:true
+      showConfirmButton: true,
+      showCancelButton: true
+    }).then(async res => {
+      if (res.isConfirmed) {
+        await updateTransaction(formData);
+        Swal.fire({
+          icon:'success',
+          message: 'Pesanan telah diterima!'
+        })
+      }
     });
   };
 
-  
+
 
   const updateTransaction = async (body) => {
     try {
@@ -114,6 +121,7 @@ const OrderItem = ({ data, refetch }) => {
       console.log(error);
     }
   };
+
 
   return (
     <Flex
@@ -150,6 +158,18 @@ const OrderItem = ({ data, refetch }) => {
           <Product data={item} key={i} />
         ))}
       </Flex>
+
+      <Flex
+        p={"2"}
+        flexDirection={isSmallScreen ? "column" : "row"}
+        gap={"2"}
+        justifyContent={"space-between"}
+      >
+        <Text fontSize={"lg"}>Shipping : </Text>
+        <Text fontSize={"lg"} fontWeight={"bold"}>
+          Rp{Intl.NumberFormat("id-ID").format(data.shipping)}
+        </Text>
+      </Flex>
       <Flex
         p={"2"}
         flexDirection={isSmallScreen ? "column" : "row"}
@@ -158,7 +178,7 @@ const OrderItem = ({ data, refetch }) => {
       >
         <Text fontSize={"lg"}>Total Belanja : </Text>
         <Text fontSize={"lg"} fontWeight={"bold"}>
-          Rp{Intl.NumberFormat("id-ID").format(data.total_price)}
+          Rp{Intl.NumberFormat("id-ID").format(data.total_price + data.shipping)}
         </Text>
       </Flex>
       {data.order_status.id === 1 && (
