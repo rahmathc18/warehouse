@@ -329,6 +329,7 @@ module.exports = {
                         warehouse_location_id: nearestWarehouse_id
                     })
                     await product_location.decrement('qty', { by: quantity[i], where: { product_id: productId, warehouse_location_id: nearestWarehouse_id } })
+                    await product.decrement('stock', { by: quantity[i], where: {id: productId} })
 
                 })
             )
