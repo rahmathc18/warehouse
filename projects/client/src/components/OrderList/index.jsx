@@ -33,7 +33,7 @@ const OrderList = () => {
 
     useEffect(() => {
         fetchOrderList();
-    }, []);
+    }, [userId]);
 
     return (
         <Box display={"flex"} flexDirection={"column"}>
