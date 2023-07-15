@@ -1,4 +1,4 @@
-import { Box, useMediaQuery, Text, Stack, Image, HStack, Button, Select, Flex } from "@chakra-ui/react";
+import { Box, useMediaQuery, Text, Stack, Image, HStack, Button, Select, Flex, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import OrderItem from "./OrderItem";
 import axios from "axios";
@@ -79,15 +79,16 @@ const OrderList = () => {
 
     return (
         <Box display={"flex"} flexDirection={"column"}>
-            <Flex mt={'2'}>
-                <Select border={'1px'} borderColor={'gray.400'} onChange={(e)=> setFilter(e.target.value)}>
+            <VStack mt={'4'} alignItems={'flex-start'}>
+                <Text fontSize={'lg'} fontWeight={'semibold'}>Filter Order</Text>
+                <Select border={'2px'} fontWeight={'bold'} borderColor={'gray.400'} onChange={(e)=> setFilter(e.target.value)}>
                     {
                         STATUS_ORDER.map(status=>(
                             <option key={status.id} value={status.id}>{status.status}</option>
                         ))
                     }
                 </Select>
-            </Flex>
+            </VStack>
             {orders.length === 0 ? (
                 <Stack spacing="4" align="center" mt={4}>
                     <Text fontSize="xl" fontWeight="bold">
