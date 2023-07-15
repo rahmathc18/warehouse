@@ -124,7 +124,7 @@ const checkPayment = async () => {
             where: {
                 order_status_id: 1,
                 transaction_date: {
-                    [Op.gte]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
+                    [Op.gte]: new Date(+currentDate.getFullYear(), +currentDate.getMonth(), +currentDate.getDate(),0,0),
                     [Op.lt]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
                 }
             }
