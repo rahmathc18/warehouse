@@ -21,8 +21,8 @@ module.exports = {
       const condition = {
         user_id: user_id,
         order_status_id: +status !== 0 ? +status : { [Op.not]: null },
-
       };
+      console.log( { page, user_id, status });
 
 
       const data = await transaction.findAll({

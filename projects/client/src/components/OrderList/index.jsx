@@ -8,31 +8,31 @@ import pict from "../../assets/not_found.png";
 const BASE_API = process.env.REACT_APP_API_BASE_URL;
 const STATUS_ORDER = [
     {
-        id:0,
-        status: 'All Order' 
+        id: 0,
+        status: 'All Order'
     },
     {
-        id:1,
+        id: 1,
         status: 'Menunggu Pembayaran'
     },
     {
-        id:2,
+        id: 2,
         status: 'Menunggu Konfirmasi Pembayaran'
     },
     {
-        id:3,
+        id: 3,
         status: 'Pesanan Diproses'
     },
     {
-        id:4,
+        id: 4,
         status: 'Pesanan Dikirim'
     },
     {
-        id:5,
+        id: 5,
         status: 'Pesanan Selesan'
     },
     {
-        id:6,
+        id: 6,
         status: 'Pesanan Batal'
     },
 ]
@@ -56,6 +56,7 @@ const OrderList = () => {
     };
 
     const fetchOrderList = async (page, status) => {
+
         try {
             const { data } = await axios.get(
                 BASE_API + `/users/transactions?user_id=${userId}&status=${status}&page=${page}`,
@@ -81,9 +82,9 @@ const OrderList = () => {
         <Box display={"flex"} flexDirection={"column"}>
             <VStack mt={'4'} alignItems={'flex-start'}>
                 <Text fontSize={'lg'} fontWeight={'semibold'}>Filter Order</Text>
-                <Select border={'2px'} fontWeight={'bold'} borderColor={'gray.400'} onChange={(e)=> setFilter(e.target.value)}>
+                <Select border={'2px'} fontWeight={'bold'} borderColor={'gray.400'} onChange={(e) => setFilter(e.target.value)}>
                     {
-                        STATUS_ORDER.map(status=>(
+                        STATUS_ORDER.map(status => (
                             <option key={status.id} value={status.id}>{status.status}</option>
                         ))
                     }
@@ -102,7 +103,7 @@ const OrderList = () => {
                 </Stack>
             ) : (
                 orders.map((item, i) => (
-                    <OrderItem key={i} refetch={fetchOrderList} data={item} />
+                    <OrderItem key={i} refetch={() => fetchOrderList(currentPage, filter)} data={item} />
                 ))
             )}
             <HStack justifyContent="center" spacing={4} mt={'5'}>

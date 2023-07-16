@@ -94,7 +94,7 @@ const OrderItem = ({ data, refetch }) => {
         await updateTransaction(formData);
         Swal.fire({
           icon:'success',
-          message: 'Pesanan telah diterima!'
+          text: 'Pesanan telah diterima!'
         })
       }
     });
