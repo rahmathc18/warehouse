@@ -18,87 +18,89 @@ import { cartUser } from "./redux/cartSlice";
 import Axios from "axios";
 import { AddressPage } from "./pages/UserAddressPage";
 import OrderListPage from "./pages/OrderListPage";
+import { BadRequestPage } from "./pages/BadRequestPage";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-    errorElement: <ErrorPage />,
-  },
-  { path: "/activation/:token", element: <VerificationPage /> },
-  { path: "/reset-password/:token", element: <ResetPasswordPage /> },
-  { path: "/admin", element: <AdminPage />, errorElement: <ErrorPage /> },
-  { path: "/product/:name", element: <DetailProductPage /> },
-  {
-    path: "profile/settings",
-    element: <ProfilePage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "profile/address",
-    element: <AddressPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/cart",
-    element: <CartPage />,
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: "/order-list",
-    element: <OrderListPage />,
-    errorElement: <ErrorPage />,
-  },
+    {
+        path: "/",
+        element: <HomePage />,
+        errorElement: <ErrorPage />,
+    },
+    { path: "/bad-request", element: <BadRequestPage /> },
+    { path: "/activation/:token", element: <VerificationPage /> },
+    { path: "/reset-password/:token", element: <ResetPasswordPage /> },
+    { path: "/admin", element: <AdminPage />, errorElement: <ErrorPage /> },
+    { path: "/product/:name", element: <DetailProductPage /> },
+    {
+        path: "profile/settings",
+        element: <ProfilePage />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "profile/address",
+        element: <AddressPage />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/cart",
+        element: <CartPage />,
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: "/order-list",
+        element: <OrderListPage />,
+        errorElement: <ErrorPage />,
+    },
 
-  { path: "/category/:category", element: <ProductFilteredPage /> },
-  {
-    path: "/checkout",
-    element: <CheckoutPage />,
-    errorElement: <ErrorPage />,
-  },
+    { path: "/category/:category", element: <ProductFilteredPage /> },
+    {
+        path: "/checkout",
+        element: <CheckoutPage />,
+        errorElement: <ErrorPage />,
+    },
 
-  { path: "/product-results/:querry", element: <ProductBySearchPage /> },
+    { path: "/product-results/:querry", element: <ProductBySearchPage /> },
 ]);
 
 function App() {
-  const url = process.env.REACT_APP_API_BASE_URL;
-  const dispatch = useDispatch();
-  const token = localStorage.getItem("token");
-  const { id } = useSelector((state) => state.userSlice.value);
+    const url = process.env.REACT_APP_API_BASE_URL;
+    const dispatch = useDispatch();
+    const token = localStorage.getItem("token");
+    const { id } = useSelector((state) => state.userSlice.value);
 
-  const keepLogin = useCallback(async () => {
-    try {
-      const result = await Axios.get(`${url}/users/keeplogin`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      dispatch(
-        login({
-          id: result.data.id,
-          email: result.data.email,
-          name: result.data.name,
-          is_verified: result.data.is_verified,
-          role: result.data.role,
-          photo_profile: result.data.photo_profile,
-        })
-      );
+    const keepLogin = useCallback(async () => {
+        try {
+            const result = await Axios.get(`${url}/users/keeplogin`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            dispatch(
+                login({
+                    id: result.data.id,
+                    email: result.data.email,
+                    name: result.data.name,
+                    is_verified: result.data.is_verified,
+                    role: result.data.role,
+                    photo_profile: result.data.photo_profile,
+                })
+            );
 
-      // console.log(result);
+            // console.log(result);
 
-      const cart = await (await Axios.get(`${url}/fetch-cart`)).data;
-      dispatch(cartUser(cart.result));
-    } catch (error) {}
-  }, [dispatch, id, token]);
+            const cart = await (await Axios.get(`${url}/fetch-cart`)).data;
+            dispatch(cartUser(cart.result));
+        } catch (error) {}
+    }, [dispatch, id, token]);
 
-  useEffect(() => {
-    keepLogin();
-  }, [keepLogin]);
-  return (
-    <main>
-      <RouterProvider router={router} />
-    </main>
-  );
+    useEffect(() => {
+        keepLogin();
+    }, [keepLogin]);
+    return (
+        <main>
+            <RouterProvider router={router} />
+        </main>
+    );
 }
 
 export default App;

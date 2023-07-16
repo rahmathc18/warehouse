@@ -10,7 +10,7 @@ const product_location = db.product_location;
 const transaction = db.transaction;
 const transaction_item = db.transaction_item;
 const warehouse_location = db.warehouse_location;
-const stock_journal = db.stock_journal
+const stock_journal = db.stock_journal;
 
 module.exports = {
     fetchCart: async (req, res) => {
@@ -66,6 +66,13 @@ module.exports = {
             if (!userVerified || userVerified.is_verified !== true) {
                 throw {
                     message: "Please Login or Verify Your Account First!",
+                };
+            }
+
+            if (userVerified.role > 1) {
+                throw {
+                    message:
+                        "Admin accounts cannot make transactions, please login using a user account!",
                 };
             }
 
@@ -205,9 +212,9 @@ module.exports = {
                 var a =
                     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                     Math.sin(dLon / 2) *
-                    Math.sin(dLon / 2) *
-                    Math.cos(lat1) *
-                    Math.cos(lat2);
+                        Math.sin(dLon / 2) *
+                        Math.cos(lat1) *
+                        Math.cos(lat2);
                 var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 var d = R * c;
                 return d;
@@ -309,30 +316,38 @@ module.exports = {
                 where: { warehouse_location_id: nearestWarehouse_id },
             });
 
-            // update stock  
+            // update stock
             await Promise.all(
                 product_id.map(async (productId, i) => {
                     const qtyBefore = product_locations.find(
                         (item) => item.product_id === productId
-                    )
+                    );
                     await stock_journal.create({
                         journal_date: new Date(),
-                        type: 'Sold',
-                        increment_change:0,
+                        type: "Sold",
+                        increment_change: 0,
                         decrement_change: quantity[i],
                         total_qty_before: +qtyBefore.qty,
                         new_total_qty: +qtyBefore.qty - quantity[i],
-                        description: 'Sold',
+                        description: "Sold",
                         createdAt: new Date(),
                         updatedAt: new Date(),
                         product_id: productId,
-                        warehouse_location_id: nearestWarehouse_id
-                    })
-                    await product_location.decrement('qty', { by: quantity[i], where: { product_id: productId, warehouse_location_id: nearestWarehouse_id } })
-                    await product.decrement('stock', { by: quantity[i], where: {id: productId} })
-
+                        warehouse_location_id: nearestWarehouse_id,
+                    });
+                    await product_location.decrement("qty", {
+                        by: quantity[i],
+                        where: {
+                            product_id: productId,
+                            warehouse_location_id: nearestWarehouse_id,
+                        },
+                    });
+                    await product.decrement("stock", {
+                        by: quantity[i],
+                        where: { id: productId },
+                    });
                 })
-            )
+            );
 
             for (let i = 0; i < product_id.length; i++) {
                 await transaction_item.create({
@@ -345,8 +360,6 @@ module.exports = {
                 });
             }
 
-
-
             // Destory cart by cart id
             const cartDestroy = Item.map((item) => item.id);
             for (let i = 0; i < cartDestroy.length; i++) {
@@ -356,8 +369,6 @@ module.exports = {
                     },
                 });
             }
-
-
 
             console.log("SUCCESS");
             res.status(200).send({ status: true });
