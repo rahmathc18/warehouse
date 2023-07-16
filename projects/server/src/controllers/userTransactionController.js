@@ -100,7 +100,7 @@ module.exports = {
             await product.increment('stock',{
               by: item.qty,
               where : {
-                id: item.product_location_id
+                id: pl.product_id
               } 
             })
             await stock_journal.create({

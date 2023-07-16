@@ -28,6 +28,8 @@ import {
     ModalBody,
     ModalCloseButton,
     useDisclosure,
+    Link,
+    VStack,
 } from "@chakra-ui/react";
 
 import { BiSearch } from "react-icons/bi";
@@ -48,7 +50,9 @@ function formatDate(val) {
 
     return `${day}-${month}-${year}`;
 }
-
+function formatCurrency(params) {
+    return Intl.NumberFormat('id-ID').format(params)
+}
 export const TransactionList = () => {
     const url = process.env.REACT_APP_API_BASE_URL + "/admin";
     const token = localStorage.getItem("token");
@@ -192,14 +196,14 @@ export const TransactionList = () => {
                 url + `/transaction/${id}`,
                 { status }
             );
-            console.log(res);
+            // console.log(res);
             await getTransaction();
             Swal.fire({
                 text: TEXT_MESSAGE[status],
                 icon: "success",
             });
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     };
 
@@ -455,28 +459,36 @@ export const TransactionList = () => {
                         </Box>
                     </ModalBody>
                     <ModalFooter>
-                        {+transaction.find((item) => item.id === openModal)
-                            ?.order_status_id < 3 && (
-                            <Flex>
-                                <Button
-                                    colorScheme="whatsapp"
-                                    mr={3}
-                                    onClick={() =>
-                                        handleAcceptPayment(openModal)
-                                    }
-                                >
-                                    Confirm Payment
-                                </Button>
-                                <Button
-                                    colorScheme="red"
-                                    onClick={() =>
-                                        handleRejectPayment(openModal)
-                                    }
-                                >
-                                    Reject Payment
-                                </Button>
-                            </Flex>
-                        )}
+                        <Flex justifyContent={'space-around'} w={'full'}>
+                            <Button colorScheme="blue" size={'sm'} as={Link} href={serverApi +
+                                transaction.find(
+                                    (item) => item.id === openModal
+                                )?.upload_payment} target="_blank">Download</Button>
+
+                            {+transaction.find((item) => item.id === openModal)
+                                ?.order_status_id < 3 && (
+                                    <>
+                                        <Button
+                                            colorScheme="whatsapp"
+                                            size={'sm'}
+                                            onClick={() =>
+                                                handleAcceptPayment(openModal)
+                                            }
+                                        >
+                                            Confirm Payment
+                                        </Button>
+                                        <Button
+                                            colorScheme="red"
+                                            size={'sm'}
+                                            onClick={() =>
+                                                handleRejectPayment(openModal)
+                                            }
+                                        >
+                                            Reject Payment
+                                        </Button>
+                                    </>
+                                )}
+                        </Flex>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
@@ -517,7 +529,18 @@ export const TransactionList = () => {
                             <Text>No items found.</Text>
                         )}
                     </ModalBody>
-                    <ModalFooter></ModalFooter>
+                    <ModalFooter>
+                    <Flex justifyContent={'space-between'} w={'full'}>
+                            <VStack alignItems={'flex-start'}>
+                                <Text>Shippment Cost</Text>
+                                <Text>Total Cost</Text>
+                            </VStack>
+                            <VStack alignItems={'flex-end'}>
+                                <Text>Rp{formatCurrency(transaction.find(item => selectedTransactionId === item.id)?.shipping)}</Text>
+                                <Text>Rp{formatCurrency(transaction.find(item => selectedTransactionId === item.id)?.shipping + transaction.find(item => selectedTransactionId === item.id)?.total_price)}</Text>
+                            </VStack>
+                        </Flex>
+                    </ModalFooter>
                 </ModalContent>
             </Modal>
         </Box>
