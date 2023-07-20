@@ -119,7 +119,7 @@ export const ChangePassword = ({ user, token }) => {
                 Change Password
             </Button>
 
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={()=> {onClose(); formik.resetForm()}}>
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Change Password</ModalHeader>
@@ -189,7 +189,7 @@ export const ChangePassword = ({ user, token }) => {
                         </form>
                     </ModalBody>
                     <ModalFooter>
-                        <Button variant="ghost" onClick={onClose}>
+                        <Button variant="ghost" onClick={()=> {onClose(); formik.resetForm()}}>
                             Cancel
                         </Button>
                     </ModalFooter>
