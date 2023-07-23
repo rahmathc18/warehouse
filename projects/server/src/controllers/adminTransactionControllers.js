@@ -3,6 +3,7 @@ const { Op } = require("sequelize");
 //import model
 const db = require("../models");
 const transaction = db.transaction;
+const stock_journal = db.stock_journal;
 const transaction_item = db.transaction_item;
 const product_location = db.product_location;
 const product = db.product;
